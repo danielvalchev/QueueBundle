@@ -3,7 +3,6 @@
 namespace IdeasBucket\QueueBundle\Type;
 
 use Aws\Sqs\SqsClient;
-use IdeasBucket\QueueBundle\Job\JobsInterface;
 use IdeasBucket\QueueBundle\Job\SqsJob;
 
 /**
@@ -37,9 +36,9 @@ class SqsQueue extends AbstractQueue implements QueueInterface
     /**
      * Create a new Amazon SQS queue instance.
      *
-     * @param  \Aws\Sqs\SqsClient  $sqs
-     * @param  string  $default
-     * @param  string  $prefix
+     * @param  \Aws\Sqs\SqsClient $sqs
+     * @param  string $default
+     * @param  string $prefix
      */
     public function __construct(SqsClient $sqs, $default, $prefix = '')
     {
@@ -60,7 +59,7 @@ class SqsQueue extends AbstractQueue implements QueueInterface
 
         $attributes = $response->get('Attributes');
 
-        return (int) $attributes['ApproximateNumberOfMessages'];
+        return (int)$attributes['ApproximateNumberOfMessages'];
     }
 
     /**
@@ -76,8 +75,11 @@ class SqsQueue extends AbstractQueue implements QueueInterface
      */
     public function pushRaw($payload, $queue = null, array $options = [])
     {
+        
         return $this->sqs->sendMessage([
-            'QueueUrl' => $this->getQueue($queue), 'MessageBody' => $payload,
+            'QueueUrl' => $this->getQueue($queue),
+            'MessageBody' => $payload,
+            'MessageGroupId' => $this->getQueue($queue),
         ])->get('MessageId');
     }
 
@@ -89,6 +91,7 @@ class SqsQueue extends AbstractQueue implements QueueInterface
         return $this->sqs->sendMessage([
             'QueueUrl' => $this->getQueue($queue),
             'MessageBody' => $this->createPayload($job, $data),
+            'MessageGroupId' => $queue,
             'DelaySeconds' => $this->secondsUntil($delay),
         ])->get('MessageId');
     }
@@ -116,12 +119,13 @@ class SqsQueue extends AbstractQueue implements QueueInterface
     /**
      * Get the queue or return the default.
      *
-     * @param  string|null  $queue
+     * @param  string|null $queue
+     *
      * @return string
      */
     public function getQueue($queue)
     {
-        $queue = $queue ?: $this->default;
+        $queue = $queue ? : $this->default;
 
         return filter_var($queue, FILTER_VALIDATE_URL) === false ? rtrim($this->prefix, '/') . '/' . $queue : $queue;
     }
