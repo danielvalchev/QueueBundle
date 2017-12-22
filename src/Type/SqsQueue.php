@@ -80,6 +80,7 @@ class SqsQueue extends AbstractQueue implements QueueInterface
             'QueueUrl' => $this->getQueue($queue),
             'MessageBody' => $payload,
             'MessageGroupId' => $this->getQueue($queue),
+            'MessageDeduplicationId' => (string)microtime(true)
         ])->get('MessageId');
     }
 
@@ -92,6 +93,7 @@ class SqsQueue extends AbstractQueue implements QueueInterface
             'QueueUrl' => $this->getQueue($queue),
             'MessageBody' => $this->createPayload($job, $data),
             'MessageGroupId' => $queue,
+            'MessageDeduplicationId' => (string)microtime(true),
             'DelaySeconds' => $this->secondsUntil($delay),
         ])->get('MessageId');
     }
