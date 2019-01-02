@@ -85,7 +85,7 @@ class Listener
      */
     protected function phpBinary()
     {
-        return ProcessUtils::escapeArgument((new PhpExecutableFinder)->find(false));
+        return (new PhpExecutableFinder)->find(false);
     }
 
     /**
@@ -95,7 +95,7 @@ class Listener
      */
     protected function consoleBinary()
     {
-        return defined('CONSOLE_BINARY') ? ProcessUtils::escapeArgument(CONSOLE_BINARY) : 'console';
+        return defined('CONSOLE_BINARY') ? CONSOLE_BINARY : 'console';
     }
 
     /**
@@ -132,7 +132,6 @@ class Listener
         // workers will run under the specified environment. Otherwise, they will
         // just run under the production environment which is not always right.
         if (isset($options->environment)) {
-
             $command = $this->addEnvironment($command, $options);
         }
 
@@ -154,7 +153,7 @@ class Listener
      */
     protected function addEnvironment($command, ListenerOptions $options)
     {
-        return $command . ' --env=' . ProcessUtils::escapeArgument($options->environment);
+        return $command . ' --env=' . $options->environment;
     }
 
     /**
@@ -171,8 +170,8 @@ class Listener
     {
         return sprintf(
             $command,
-            ProcessUtils::escapeArgument($connection),
-            ProcessUtils::escapeArgument($queue),
+            $connection,
+            $queue,
             $options->delay, $options->memory,
             $options->sleep, $options->maxTries
         );
