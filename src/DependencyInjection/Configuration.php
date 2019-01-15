@@ -97,7 +97,7 @@ class Configuration implements ConfigurationInterface
             ->thenInvalid('For database driver repository must be defined.')
             ->end()
             ->children()
-                ->enumNode('default')->values($drivers)->defaultValue('sync')->end()
+                ->scalarNode('default')->defaultValue('sync')->end()
                 ->scalarNode('lock_path')
                     ->defaultNull()
                     ->info('Use this setting to define path to store the lock.')
